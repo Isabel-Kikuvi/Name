@@ -17,7 +17,7 @@ int main(void) {
     while (1) {
         input_buffer = (char *)malloc(buffer_size * sizeof(char));
         if (input_buffer == NULL) {
-            perror("Error");  //malloc failed to assign memory
+            perror("Error, malloc failed");  
             exit(EXIT_FAILURE);
         }
 
@@ -41,14 +41,13 @@ int main(void) {
 
         pid = fork();
         if (pid < 0) {
-            perror("Error"); // fork not sucessful
+            perror("Error"); 
             exit(EXIT_FAILURE);
         }
 
         if (pid == 0) {
             execlp(program, program, NULL);
-            perror("Error");   //exec failed
-            exit(EXIT_FAILURE);
+            perror("Error");               exit(EXIT_FAILURE);
         } else {
             waitpid(pid, &status, 0);
         }
