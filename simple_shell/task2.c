@@ -4,46 +4,51 @@
 #include <string.h>
 #include <sys/wait.h>
 
-#define MAX_INPUT_LENGTH 100
-#define MAX_ARGV_LENGTH 10
 
 int main() {
-    char input[MAX_INPUT_LENGTH];
-    char *argv[MAX_ARGV_LENGTH];
+    char *input = NULL; *input_copy = NULL;
+    char *argv;
     int status;
-    char *token;
+    char *token, *delim = " \n";
+    size_t n = 0;
     pid_t pid;
     int argc;
 
     while (1) {
         printf("$ ");
-        fflush(stdout);
-        if (fgets(input, MAX_INPUT_LENGTH, stdin) == NULL) {
+        
+        if (getline(&input, &n, stdin) == -1) 
+	{
             break;
         }
 
-        input[strcspn(input, "\n")] = '\0';
+        input_copy = strdup(input);
+        token = strtok(input, delim);
+	argc = 0;
 
-        token = strtok(input, " ");
-        argc = 0;
-        while (token != NULL && argc < MAX_ARGV_LENGTH - 1) {
+        while (token) 
+	{
             argv[argc] = token;
             argc++;
-            token = strtok(NULL, " ");
+            token = strtok(NULL, delim);
         }
         argv[argc] = NULL;
 
         pid = fork();
 
-        if (pid < 0) {
+        if (pid < 0) 
+	{
             perror("fork");
             exit(EXIT_FAILURE);
-        } else if (pid == 0) {
-            
-            execvp(argv[0], argv);
+        } 
+	else if (pid == 0) 
+	{
+	    execvp(argv[0], argv);
             perror(argv[0]);
             exit(EXIT_FAILURE);
-        } else {
+        } 
+	else 
+	{
             
             waitpid(pid, &status, 0);
         }
